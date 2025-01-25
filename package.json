@@ -1,0 +1,9 @@
+{
+  "name": "taska",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "rajababu <123633963+umarei@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": ["services/*", "frontend"]
+}

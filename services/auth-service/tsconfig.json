@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    /* Basic Options */
+    "target": "es2016",                            /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    "module": "commonjs",                          /* Specify what module code is generated. */
+    "moduleResolution": "node",                   /* Specify how TypeScript looks up a file from a given module specifier. */
+    "outDir": "./dist",                            /* Specify an output folder for all emitted files. */
+    "rootDir": "./",                               /* Specify the root folder within your source files. */
+    "strict": true,                                /* Enable all strict type-checking options. */
+
+    /* Decorators and Metadata */
+    "experimentalDecorators": true,               /* Enable support for legacy experimental decorators. */
+    "emitDecoratorMetadata": true,                /* Emit design-type metadata for decorated declarations in source files. */
+
+    /* Interop and Compatibility */
+    "esModuleInterop": true,                      /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+    "forceConsistentCasingInFileNames": true,     /* Ensure that casing is correct in imports. */
+    "skipLibCheck": true,                         /* Skip type checking of declaration files (.d.ts). */
+
+    /* Source Maps */
+    "sourceMap": true,                            /* Create source map files for emitted JavaScript files. */
+    "inlineSources": true,                        /* Include source code in the sourcemaps inside the emitted JavaScript. */
+
+    /* Paths and Types */
+    "baseUrl": "./",                              /* Specify the base directory to resolve non-relative module names. */
+    "paths": {                                    /* Map module paths for cleaner imports (adjust as needed). */
+      "@src/*": ["src/*"],
+      "@models/*": ["src/models/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@services/*": ["src/services/*"],
+      "@routes/*": ["src/routes/*"],
+      "@utils/*": ["src/utils/*"]
+    },
+    "typeRoots": ["node_modules/@types"],         /* Specify multiple folders that act like './node_modules/@types'. */
+
+    /* Additional Options */
+    "allowJs": false,                             /* Disallow JavaScript files in the project. */
+    "resolveJsonModule": true                     /* Enable importing .json files. */
+  },
+  "include": ["src/**/*.ts"],                     /* Specify the files or patterns to include in the compilation. */
+  "exclude": ["node_modules", "dist"]             /* Specify the files or patterns to exclude from compilation. */
+}

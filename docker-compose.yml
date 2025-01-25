@@ -1,0 +1,160 @@
+version: "3.8"
+
+services:
+  # Auth Service
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "5001:5001"
+    depends_on:
+      - postgres
+    environment:
+      - NODE_ENV=development
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=taksa_user
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=taksa_auth
+    networks:
+      - taksa-network
+
+  # Blockchain Service
+  blockchain-service:
+    build: ./services/blockchain-service
+    container_name: blockchain-service
+    ports:
+      - "5002:5002"
+    depends_on:
+      - postgres
+      - kafka
+    environment:
+      - NODE_ENV=development
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=taksa_user
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=taksa_blockchain
+      - KAFKA_BROKER=kafka:9092
+    networks:
+      - taksa-network
+
+  # Wallet Service
+  wallet-service:
+    build: ./services/wallet-service
+    container_name: wallet-service
+    ports:
+      - "5003:5003"
+    depends_on:
+      - redis
+      - kafka
+    environment:
+      - NODE_ENV=development
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_BROKER=kafka:9092
+    networks:
+      - taksa-network
+
+  # Explorer Service
+  explorer-service:
+    build: ./services/explorer-service
+    container_name: explorer-service
+    ports:
+      - "5004:5004"
+    depends_on:
+      - postgres
+      - kafka
+    environment:
+      - NODE_ENV=development
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=taksa_user
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=taksa_explorer
+      - KAFKA_BROKER=kafka:9092
+    networks:
+      - taksa-network
+
+  # Frontend
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
+      - blockchain-service
+      - wallet-service
+      - explorer-service
+    networks:
+      - taksa-network
+
+  # PostgreSQL
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: taksa_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: taksa
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - taksa-network
+
+  # Redis
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - taksa-network
+
+  # Kafka
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+    networks:
+      - taksa-network
+
+  # Zookeeper (Kafka Dependency)
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - taksa-network
+
+  # Nginx
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - auth-service
+      - blockchain-service
+      - wallet-service
+      - explorer-service
+    networks:
+      - taksa-network
+
+volumes:
+  postgres_data: {}
+
+networks:
+  taksa-network:
+    driver: bridge
