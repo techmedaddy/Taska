@@ -1,4 +1,5 @@
-import { hashPassword, comparePasswords, generateToken, verifyToken } from '../src/services/authService';
+import { hashPassword, comparePasswords, generateToken, verifyToken } from '../../src/services/authService';
+import { describe, test, expect, beforeAll } from '@jest/globals';
 
 describe('authService Tests', () => {
     const plainPassword = 'password123';
@@ -8,9 +9,7 @@ describe('authService Tests', () => {
     let token: string;
 
     beforeAll(async () => {
-        // Hash password for tests
         hashedPassword = await hashPassword(plainPassword);
-        // Generate token for tests
         token = generateToken(userPayload);
     });
 

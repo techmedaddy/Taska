@@ -1,10 +1,27 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../database';
 import { User } from '../models/User';
+import bcrypt from 'bcrypt';
 
-export const getUserProfile = async (req: Request, res: Response) => {
+// Extend Express Request to include user property
+interface AuthenticatedRequest extends Request {
+    user?: {
+        id: string;
+        email: string;
+        role: string;
+    };
+}
+
+export const getUserProfile = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const userId = req.user.id; // `req.user` should be populated by auth middleware
+        if (!req.user) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const userId = parseInt(req.user.id, 10); // Convert string to number
+        if (isNaN(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
 
         // Fetch the user profile
         const userRepository = AppDataSource.getRepository(User);
@@ -21,9 +38,17 @@ export const getUserProfile = async (req: Request, res: Response) => {
     }
 };
 
-export const updateUserProfile = async (req: Request, res: Response) => {
+export const updateUserProfile = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const userId = req.user.id; // `req.user` should be populated by auth middleware
+        if (!req.user) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const userId = parseInt(req.user.id, 10); // Convert string to number
+        if (isNaN(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
+
         const { email, password } = req.body;
 
         // Fetch the user
