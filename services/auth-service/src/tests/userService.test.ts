@@ -1,16 +1,18 @@
-import { createUser, getUserByEmail, getUserById, updateUser } from '../services/userService';
-import { AppDataSource } from '../database';
-import { User } from '../models/User';
-
-// Ensure Jest recognizes testing functions
+import { createUser, getUserByEmail, getUserById, updateUser } from '../../src/services/userService';
+import { AppDataSource } from '../../src/database';
+import { User } from '../../src/models/User';
 import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 
 beforeAll(async () => {
-    await AppDataSource.initialize(); // Initialize the database for testing
+    if (!AppDataSource.isInitialized) {
+        await AppDataSource.initialize();
+    }
 });
 
 afterAll(async () => {
-    await AppDataSource.destroy(); // Clean up the database connection
+    if (AppDataSource.isInitialized) {
+        await AppDataSource.destroy();
+    }
 });
 
 describe('userService Tests', () => {
