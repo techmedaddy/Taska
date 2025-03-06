@@ -1,6 +1,6 @@
-import { createUser, getUserByEmail, getUserById, updateUser } from '../../src/services/userService';
-import { AppDataSource } from '../../src/database';
-import { User } from '../../src/models/User';
+import { createUser, getUserByEmail, getUserById, updateUser } from '../../src/services/userService.js';
+import { AppDataSource } from '../../src/database.js';
+import { User } from '../../src/models/User.js';
 import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 
 beforeAll(async () => {

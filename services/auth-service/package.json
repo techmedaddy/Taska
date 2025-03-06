@@ -1,9 +1,10 @@
 {
   "name": "auth-service",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "dev": "ts-node --loader ts-node/esm src/index.ts",
     "build": "tsc",
     "test": "jest"
   },
@@ -33,5 +34,12 @@
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.1"
+  },
+  "exports": {
+    "./package.json": "./package.json"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=16"
   }
 }

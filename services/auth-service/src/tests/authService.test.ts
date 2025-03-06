@@ -1,4 +1,4 @@
-import { hashPassword, comparePasswords, generateToken, verifyToken } from '../../src/services/authService';
+import { hashPassword, comparePasswords, generateToken, verifyToken } from '../../src/services/authService.js';
 import { describe, test, expect, beforeAll } from '@jest/globals';
 
 describe('authService Tests', () => {

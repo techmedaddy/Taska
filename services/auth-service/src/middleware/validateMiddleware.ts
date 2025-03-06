@@ -8,12 +8,12 @@ import { validationResult } from 'express-validator';
  * @param res - The Express response object.
  * @param next - The next middleware function in the stack.
  */
-
-export const validateRequest = (req: Request, res: Response, next: NextFunction): Response | void => {
+export const validateRequest = (req: Request, res: Response, next: NextFunction): void => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        res.status(400).json({ errors: errors.array() });
+        return; // Explicitly return to satisfy TypeScript
     }
 
     next(); // Proceed to the next middleware or route handler

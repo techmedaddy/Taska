@@ -1,5 +1,5 @@
-import { AppDataSource } from '../database';
-import { User } from '../models/User';
+import { AppDataSource } from '../database.js';
+import { User } from '../models/User.js';
 
 /**
  * Creates a new user in the database.
