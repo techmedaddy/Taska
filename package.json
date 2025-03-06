@@ -5,5 +5,21 @@
   "author": "rajababu <123633963+umarei@users.noreply.github.com>",
   "license": "MIT",
   "private": true,
-  "workspaces": ["services/*", "frontend"]
+  "workspaces": ["services/*", "frontend"],
+  "scripts": {
+    "test": "jest --runInBand --forceExit",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "supertest": "^6.3.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "pg": "^8.10.0",
+    "typeorm": "^0.3.10"
+  }
 }
