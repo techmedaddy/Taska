@@ -4,32 +4,32 @@ import { Transaction } from "./Transaction.js";
 @Entity()
 export class Block {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ unique: true })
-  blockHash: string; 
+  blockHash!: string; 
 
   @Column()
-  previousHash: string; 
+  previousHash!: string; 
 
   @Column({ type: "int" })
-  blockNumber: number; 
+  blockNumber!: number; 
 
   @Column()
-  miner: string;
+  miner!: string;
 
   @OneToMany(() => Transaction, (transaction) => transaction.block)
-  transactions: Transaction[];
+  transactions!: Transaction[];
 
   @CreateDateColumn()
-  timestamp: Date;
+  timestamp!: Date;
 
   @Column({ type: "bigint" })
-  difficulty: number; 
+  difficulty!: number; 
 
   @Column({ type: "bigint" })
-  nonce: number;
+  nonce!: number;
 
   @Column()
-  hash: string; // Added missing hash property
+  hash!: string; // Added missing hash property
 }
