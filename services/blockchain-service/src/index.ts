@@ -5,7 +5,7 @@ import { AppDataSource } from "./database.js";
 import blockRoutes from "./routes/blockRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
 import stakingRoutes from "./routes/stakingRoutes.js";
-import { connectProducer, sendMessage, consumeMessages } from "./utils/kafka.js"; // Updated import
+import { connectProducer } from "./utils/kafka.js"; // Updated import
 
 dotenv.config();
 const app = express();
@@ -23,7 +23,7 @@ connectProducer()
   .catch((err) => console.error("Kafka Producer Connection Error:", err));
 
 // Start server
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
-  console.log(`Auth Service running on port ${PORT}`);
+  console.log(`Blockchain Service running on port ${PORT}`); // ✅ Fix log message
 });
