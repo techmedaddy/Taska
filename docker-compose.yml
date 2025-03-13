@@ -12,14 +12,11 @@ services:
     ports:
       - "5001:5001"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - NODE_ENV=development
-      - DATABASE_HOST=postgres
-      - DATABASE_PORT=5432
-      - DATABASE_USER=taksa_user
-      - DATABASE_PASSWORD=password
-      - DATABASE_NAME=taksa_auth
+      - DATABASE_URL=postgresql://taksa_user:password@postgres:5432/taksa_auth
     networks:
       - taksa-network
 
@@ -36,13 +33,11 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     environment:
       - NODE_ENV=development
-      - DATABASE_HOST=postgres
-      - DATABASE_PORT=5432
-      - DATABASE_USER=taksa_user
-      - DATABASE_PASSWORD=password
-      - DATABASE_NAME=taksa_blockchain
+      - DATABASE_URL=postgresql://taksa_user:password@postgres:5432/taksa_blockchain
       - KAFKA_BROKER=kafka:9092
     networks:
       - taksa-network
@@ -58,10 +53,15 @@ services:
     ports:
       - "5003:5003"
     depends_on:
-      - redis
-      - kafka
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     environment:
       - NODE_ENV=development
+      - DATABASE_URL=postgresql://taksa_user:password@postgres:5432/taksa_wallet
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - KAFKA_BROKER=kafka:9092
@@ -79,15 +79,13 @@ services:
     ports:
       - "5004:5004"
     depends_on:
-      - postgres
-      - kafka
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     environment:
       - NODE_ENV=development
-      - DATABASE_HOST=postgres
-      - DATABASE_PORT=5432
-      - DATABASE_USER=taksa_user
-      - DATABASE_PASSWORD=password
-      - DATABASE_NAME=taksa_explorer
+      - DATABASE_URL=postgresql://taksa_user:password@postgres:5432/taksa_explorer
       - KAFKA_BROKER=kafka:9092
     networks:
       - taksa-network
@@ -110,7 +108,7 @@ services:
     networks:
       - taksa-network
 
-  # PostgreSQL
+  # PostgreSQL Database
   postgres:
     image: postgres:latest
     container_name: postgres
@@ -124,6 +122,10 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - taksa-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "taksa_user"]
+      interval: 10s
+      retries: 5
 
   # Redis
   redis:
@@ -133,6 +135,10 @@ services:
       - "6349:6379"
     networks:
       - taksa-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
 
   # Kafka
   kafka:
@@ -175,7 +181,7 @@ services:
     networks:
       - taksa-network
 
-  # Nginx
+  # Nginx Reverse Proxy
   nginx:
     image: nginx:latest
     container_name: nginx
