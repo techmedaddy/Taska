@@ -19,6 +19,7 @@ services:
       - DATABASE_URL=postgresql://taksa_user:password@postgres:5432/taksa_auth
     networks:
       - taksa-network
+    restart: always
 
   # Blockchain Service
   blockchain-service:
@@ -41,6 +42,7 @@ services:
       - KAFKA_BROKER=kafka:9092
     networks:
       - taksa-network
+    restart: always
 
   # Wallet Service
   wallet-service:
@@ -67,6 +69,7 @@ services:
       - KAFKA_BROKER=kafka:9092
     networks:
       - taksa-network
+    restart: always
 
   # Explorer Service
   explorer-service:
@@ -89,6 +92,7 @@ services:
       - KAFKA_BROKER=kafka:9092
     networks:
       - taksa-network
+    restart: always
 
   # Frontend
   frontend:
@@ -107,6 +111,7 @@ services:
       - explorer-service
     networks:
       - taksa-network
+    restart: always
 
   # PostgreSQL Database
   postgres:
@@ -122,6 +127,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - taksa-network
+    restart: always
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "taksa_user"]
       interval: 10s
@@ -135,6 +141,7 @@ services:
       - "6349:6379"
     networks:
       - taksa-network
+    restart: always
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -165,6 +172,7 @@ services:
       retries: 5
     networks:
       - taksa-network
+    restart: always
 
   # Zookeeper
   zookeeper:
@@ -180,6 +188,7 @@ services:
       retries: 5
     networks:
       - taksa-network
+    restart: always
 
   # Nginx Reverse Proxy
   nginx:
@@ -197,6 +206,7 @@ services:
       - explorer-service
     networks:
       - taksa-network
+    restart: always
 
 volumes:
   postgres_data: {}
