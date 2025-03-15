@@ -1,46 +1,49 @@
-import { Wallet } from "../models/wallet.model";
-import { Transaction } from "../models/transaction.model";
+import WalletModel from "../models/wallet.model";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { sendMessage } from "../kafka/kafkaProducer";
 import redisClient from "../config/redis.config";
 
-/**
- * Handles processing of transactions between wallets.
- * Ensures sufficient balance, updates wallets, and caches data.
- */
-export const handleTransaction = async (senderId: string, receiverId: string, amount: number) => {
+const prisma = new PrismaClient();
+
+export const processTransaction = async (senderId: string, receiverId: string, amount: number) => {
   try {
-    console.log("🔄 Processing transaction:", { senderId, receiverId, amount });
+    const senderWallet = await WalletModel.findWalletById(senderId);
+    const receiverWallet = await WalletModel.findWalletById(receiverId);
 
-    const senderWallet = await Wallet.findById(senderId);
-    const receiverWallet = await Wallet.findById(receiverId);
+    if (!senderWallet || !receiverWallet) throw new Error("Wallet not found");
+    if (senderWallet.balance < amount) throw new Error("Insufficient balance");
 
-    if (!senderWallet || !receiverWallet) {
-      throw new Error("❌ Wallet not found");
-    }
-    if (senderWallet.balance < amount) {
-      throw new Error("❌ Insufficient balance");
-    }
+    // ✅ Use Prisma TransactionClient properly
+    const transaction = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const updatedSender = await tx.wallet.update({
+        where: { id: senderId },
+        data: { balance: senderWallet.balance - amount },
+      });
 
-    // Deduct from sender, add to receiver
-    senderWallet.balance -= amount;
-    receiverWallet.balance += amount;
+      const updatedReceiver = await tx.wallet.update({
+        where: { id: receiverId },
+        data: { balance: receiverWallet.balance + amount },
+      });
 
-    await senderWallet.save();
-    await receiverWallet.save();
+      const newTransaction = await tx.transaction.create({
+        data: {
+          senderId,
+          receiverId,
+          amount,
+          status: "COMPLETED",
+        },
+      });
 
-    // Create transaction record
-    const transaction = await Transaction.create({
-      senderId,
-      receiverId,
-      amount,
-      status: "COMPLETED",
+      // ✅ Update Redis cache asynchronously
+      await Promise.all([
+        redisClient.set(`wallet:${senderId}`, JSON.stringify(updatedSender)),
+        redisClient.set(`wallet:${receiverId}`, JSON.stringify(updatedReceiver))
+      ]);
+
+      return newTransaction;
     });
 
-    // Update Redis Cache
-    await redisClient.set(`wallet:${senderId}`, JSON.stringify(senderWallet));
-    await redisClient.set(`wallet:${receiverId}`, JSON.stringify(receiverWallet));
-
-    // Emit Kafka event
+    // ✅ Send Kafka event asynchronously
     await sendMessage("wallet-transactions", {
       action: "TRANSACTION_COMPLETED",
       senderId,
@@ -48,10 +51,11 @@ export const handleTransaction = async (senderId: string, receiverId: string, am
       amount,
     });
 
-    console.log("✅ Transaction completed successfully:", transaction);
     return transaction;
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Error processing transaction:", error);
-    throw new Error("Transaction failed");
+    throw new Error(error.message || "Transaction failed");
   }
 };
+
+export default { processTransaction };
