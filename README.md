@@ -9,6 +9,10 @@ The system is built using Node.js (Express), TypeScript, PostgreSQL (Prisma ORM)
 ![WhatsApp Image 2025-03-11 at 14 42 16_b830a5e2](https://github.com/user-attachments/assets/f2492182-bba0-4b42-9fac-33b415657c39)
 
 
+## 🛠️🖥️ System Design 
+![image](https://github.com/user-attachments/assets/322c9e0b-5c7f-4b79-8cf9-e6d7b14e1451)
+
+
 ### 📜 Technologies Used
     Node.js & Express - Backend framework
     TypeScript - Type-safe development
